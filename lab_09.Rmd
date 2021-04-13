@@ -1,0 +1,57 @@
+---
+title: "Lab 09: Logistic Regression"
+subtitle: "Due: Thu, Apr 15 at 11:59pm ET"
+author: ""
+date: ""
+editor_options: 
+  chunk_output_type: console
+output:
+  pdf_document: default
+---
+
+```{r set_up, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "#>", highlight = TRUE,
+                      fig.align = "center")
+```
+
+## Packages
+
+```{r echo=TRUE}
+library(tidyverse)
+library(broom)
+```
+
+## Data
+
+```{r data}
+retirement <- read_csv("data/retirement_data.csv")
+```
+
+The 2018 election saw a near-record number of [retirements](https://www.pewresearch.org/fact-tank/2018/04/11/near-record-number-of-house-members-not-seeking-re-election-in-2018/) from Congress. In this lab, you will be working with data from that election.
+
+The variables in this dataset are:
+
+- `stcd`: an ID number for the congressional district. Districts are listed in 
+          alphabetic order (e.g., 101 is Alabama's first district).
+
+- `dpres`: the two-party percentage of vote received by Hillary Clinton 
+           in the district in 2016. (Third party vote has been eliminated here, 
+           this represents Democratic vote/ (Democratic + Republican Vote).)
+
+- `retiring`: a dummy variable indicating whether the representative retired in 
+              2018. The includes both representatives who left politics 
+              altogether and those who sought higher office, as well as some 
+              who resigned early.
+
+- `gopseat`: a dummy variable indicating whether the seat was held by a 
+             Republican.
+
+- `age`: he age of the representative at the end of 2018.
+
+# Exercises
+
+## Exercise 1
+
+
+
