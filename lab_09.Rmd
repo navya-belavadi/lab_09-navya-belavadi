@@ -1,8 +1,8 @@
 ---
 title: "Lab 09: Logistic Regression"
 subtitle: "Due: Thu, Apr 15 at 11:59pm ET"
-author: ""
-date: ""
+author: "Navya Belavadi"
+date: "04-16-2021"
 editor_options: 
   chunk_output_type: console
 output:
@@ -52,6 +52,50 @@ The variables in this dataset are:
 # Exercises
 
 ## Exercise 1
+```{r}
+new_retirement <- retirement %>%
+  group_by(gopseat) %>%
+  mutate(dpres = case_when(gopseat == 0 ~ dpres, gopseat == 1 ~ 100-depres), gopseat = ifelse(gopseat == 0, "Democrat", "Republican")) %>%
+  filter(!is.na(gopseat) | !is.na(age) | !is.na(retiring))
+```
+
+```{r}
+log_mod <- glm(retiring ~ dpres + factor(gopseat) + age, data = new_retirement, family = "binomial")
+tidy(log_mod)
+```
+
+## Exercise 2
+```{r}
+tidy(log_mod) %>%
+  mutate(estimate_odds = exp(estimate)) %>%
+  select(term, estimate, estimate_odds)
+```
 
 
+## Exercise 3
+```{r}
+tibble(
+  dpres = rep(33:96, times = 2),
+  gopseat = factor(rep(c("Democrat", "Republican"), each = 64)),
+  age = 59.42) %>%
+  augment(log_mod, newdata = .) %>%
+  mutate(log_mod, newdata = .) %>%
+  ggplot(aes(x = dpres, y = predicted_p, color = gopseat)) +
+  geom_line(size = 1.5) +
+  theme_minimal(base_size = 14) +
+  scale_color_manual(values = c("blue", "red")) +
+  labs(title = "Graph of Predicted Probability Values vs. Percentage of Vote", subtitle = "Colored by Political Party", x = "Percentage of Vote Received", y = "Predicted Probability", color = "Political Party")
+```
 
+## Exercise 4
+```{r}
+tibble(
+  age = 78,
+  gopseat = factor("Democrat"),
+  dpres = 70.75) %>%
+  augment(log_mod, newdata = .) %>%
+    mutate(p = exp(.fitted) / (1 + exp(.fitted))) %>%
+    pull(p)
+```
+
+## Exercise 5
