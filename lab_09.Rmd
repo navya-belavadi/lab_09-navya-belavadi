@@ -52,20 +52,20 @@ The variables in this dataset are:
 # Exercises
 
 ## Exercise 1
-```{r}
+```{r ex1.1}
 new_retirement <- retirement %>%
   group_by(gopseat) %>%
   mutate(dpres = case_when(gopseat == 0 ~ dpres, gopseat == 1 ~ 100-depres), gopseat = ifelse(gopseat == 0, "Democrat", "Republican")) %>%
   filter(!is.na(gopseat) | !is.na(age) | !is.na(retiring))
 ```
 
-```{r}
+```{r ex1.2}
 log_mod <- glm(retiring ~ dpres + factor(gopseat) + age, data = new_retirement, family = "binomial")
 tidy(log_mod)
 ```
 
 ## Exercise 2
-```{r}
+```{r ex2}
 tidy(log_mod) %>%
   mutate(estimate_odds = exp(estimate)) %>%
   select(term, estimate, estimate_odds)
@@ -73,7 +73,7 @@ tidy(log_mod) %>%
 
 
 ## Exercise 3
-```{r}
+```{r ex3}
 tibble(
   dpres = rep(33:96, times = 2),
   gopseat = factor(rep(c("Democrat", "Republican"), each = 64)),
@@ -84,11 +84,12 @@ tibble(
   geom_line(size = 1.5) +
   theme_minimal(base_size = 14) +
   scale_color_manual(values = c("blue", "red")) +
-  labs(title = "Graph of Predicted Probability Values vs. Percentage of Vote", subtitle = "Colored by Political Party", x = "Percentage of Vote Received", y = "Predicted Probability", color = "Political Party")
+  labs(title = "Graph of Predicted Probability Values vs. Percentage of Vote", subtitle = "Colored by Political Party", x = "Percentage of Vote Received", y = "Predicted Probability of Retirement", color = "Political Party")
 ```
+It can be observed from this graph that as the percentage of vote received increases for each of the political parties (Democrat and Republican), the predicted probability of retirement decreases. This relationship appears to be stronger for the Republican party than the Democratic party, as the curve of best fit for Republicans decreases at a more rapid rate than that of the Democrats. Therefore, the percentage of vote received increasing had a larger effect on the Republican party than the Democratic party. 
 
 ## Exercise 4
-```{r}
+```{r ex4}
 tibble(
   age = 78,
   gopseat = factor("Democrat"),
@@ -97,5 +98,18 @@ tibble(
     mutate(p = exp(.fitted) / (1 + exp(.fitted))) %>%
     pull(p)
 ```
+According to this logistic model, the probability that Price would retire in 2018 would be 0.0825. 
 
 ## Exercise 5
+```{r ex5.1}
+retirement_probs <- augment(log_mod, newdata = new_retirement) %>%
+  mutate(p = exp(.fitted) / (1 + exp(.fitted))) %>%
+  arrange(desc(p))
+retirement_probs
+```
+
+```{r ex5.2}
+retirement_probs %>% slice(1)
+```
+
+No member of Congress had over a 50% chance of retiring in 2018. The highest probability of retirement belongs to Pennsylvania's 5th district's representative from District 3805, which was at a 40.70% chance -- this representative did end up retiring. 
