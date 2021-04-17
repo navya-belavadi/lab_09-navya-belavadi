@@ -55,14 +55,18 @@ The variables in this dataset are:
 ```{r ex1.1}
 new_retirement <- retirement %>%
   group_by(gopseat) %>%
-  mutate(dpres = case_when(gopseat == 0 ~ dpres, gopseat == 1 ~ 100-depres), gopseat = ifelse(gopseat == 0, "Democrat", "Republican")) %>%
+  mutate(dpres = case_when(gopseat == 0 ~ dpres, gopseat == 1 ~ 100-depres), 
+         gopseat = ifelse(gopseat == 0, "Democrat", "Republican")) %>%
   filter(!is.na(gopseat) | !is.na(age) | !is.na(retiring))
 ```
 
 ```{r ex1.2}
-log_mod <- glm(retiring ~ dpres + factor(gopseat) + age, data = new_retirement, family = "binomial")
+log_mod <- glm(retiring ~ dpres + factor(gopseat) + age, data = new_retirement, 
+               family = "binomial")
 tidy(log_mod)
 ```
+
+log(p/(1-p)) = 0.0231 + 0.0130age - 0.0487dpres + 0.507gopseat 
 
 ## Exercise 2
 ```{r ex2}
@@ -71,6 +75,22 @@ tidy(log_mod) %>%
   select(term, estimate, estimate_odds)
 ```
 
+Age: Age of the candidate; When holding dpres and gopseat constant, for each 
+year in age the odds of retirement can be expected to multiply by e^-0.0130, or
+1.01. 
+
+dpres: The percentage of vote received by the presidential candidate for the 
+party which holds that Congressional seat; When holding gopseat and age 
+constant, for each increase in the percentage of vote received by the 
+presidential candidate by 1% for the party in Congress, the probability of 
+retirement on average multiplies by e^-0.0487, or 0.952. 
+
+Gopseat: Whether the seat is held by a Republican or not; When holding dpres and
+age constant, the odds of retirement for Republican Congressional seat holders 
+is e^-0.507, or 1.66 times the odds of retirement for Democrat Congressional 
+seat holders. If dpres and age are in the 0th percentile and the Congressional 
+seat is not held by a Republican candidate, the odds of retiring are e^-0.0231, 
+or 1.02.  
 
 ## Exercise 3
 ```{r ex3}
@@ -84,9 +104,18 @@ tibble(
   geom_line(size = 1.5) +
   theme_minimal(base_size = 14) +
   scale_color_manual(values = c("blue", "red")) +
-  labs(title = "Graph of Predicted Probability Values vs. Percentage of Vote", subtitle = "Colored by Political Party", x = "Percentage of Vote Received", y = "Predicted Probability of Retirement", color = "Political Party")
+  labs(title = "Predicted Retirement Probability vs. Percentage of Vote", 
+       subtitle = "Colored by Political Party", x = "Percentage of Vote 
+       Received", y = "Predicted Probability of Retirement", color = "Political 
+       Party")
 ```
-It can be observed from this graph that as the percentage of vote received increases for each of the political parties (Democrat and Republican), the predicted probability of retirement decreases. This relationship appears to be stronger for the Republican party than the Democratic party, as the curve of best fit for Republicans decreases at a more rapid rate than that of the Democrats. Therefore, the percentage of vote received increasing had a larger effect on the Republican party than the Democratic party. 
+It can be observed from this graph that as the percentage of vote received 
+increases for each of the political parties (Democrat and Republican), the 
+predicted probability of retirement decreases. This relationship appears to be 
+stronger for the Republican party than the Democratic party, as the curve of 
+best fit for Republicans decreases at a more rapid rate than that of the 
+Democrats. Therefore, the percentage of vote received increasing had a larger 
+effect on the Republican party than the Democratic party. 
 
 ## Exercise 4
 ```{r ex4}
@@ -98,7 +127,8 @@ tibble(
     mutate(p = exp(.fitted) / (1 + exp(.fitted))) %>%
     pull(p)
 ```
-According to this logistic model, the probability that Price would retire in 2018 would be 0.0825. 
+According to this logistic model, the probability that Price would retire in 
+2018 would be 0.0825, or around 8.25%. 
 
 ## Exercise 5
 ```{r ex5.1}
@@ -112,4 +142,7 @@ retirement_probs
 retirement_probs %>% slice(1)
 ```
 
-No member of Congress had over a 50% chance of retiring in 2018. The highest probability of retirement belongs to Pennsylvania's 5th district's representative from District 3805, which was at a 40.70% chance -- this representative did end up retiring. 
+No member of Congress had over a 50% chance of retiring in 2018. The highest 
+probability of retirement belongs to Pennsylvania's 5th district's 
+representative from District 3805, which was at a 40.70% chance. Since the 
+retirement variable is 1, the member retired from Congress. 
